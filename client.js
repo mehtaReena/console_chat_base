@@ -23,13 +23,18 @@ socket.on('connect', () => {
    
   });
 
-socket.on('disconnect', () => {
-    console.log('Connection lost...!');
+  
+rl.on('line', function (line) {       
+    // send chat message
+   io.emit('simple chat message',name+": "+line);   
+   rl.prompt(true);
+        
 });
 
 
-// Set the username
-
+socket.on('disconnect', () => {
+    console.log('Connection lost...!');
+});
 
 
 socket.on('simple chat message', function (data) {
@@ -38,10 +43,3 @@ socket.on('simple chat message', function (data) {
   });
 
 
-
-rl.on('line', function (line) {       
-         // send chat message
-        io.emit('simple chat message',name+": "+line);   
-        rl.prompt(true);
-             
-    });
