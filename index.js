@@ -1,6 +1,21 @@
 var app = require('express')();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+var firebase = require("firebase")
+
+firebase.initializeApp({
+
+    databaseURL: "https://gamedb-281a0-default-rtdb.firebaseio.com/",
+
+    serviceAccount: './gamedb.json', //this is file that I downloaded from Firebase Console
+
+});
+
+var db = firebase.database();
+
+var playersRef = db.ref("players");
+
+
 
 
 users = [];
@@ -29,27 +44,40 @@ io.on('connection', (socket) => {
            
              let player1ID=socketId=choices[0]['userid']; 
              let player2ID=socketId=choices[1]['userid']; 
+             let player1Name=choices[0]['user'] ;
+             let player2Name=choices[1]['user'];
+             let player1Choice=choices[0]['choice'];
+             let player2Choice=choices[1]['choice'];  
+             let msg1=""; 
+             let msg2="";   
 
              switch (choices[0]['choice'])
              {
                  case 'rock':
                      switch (choices[1]['choice'])
                      {
-                         case 'rock':                             
-                             io.to(player1ID).emit('player1', choices[1]['user'] + " chose " +choices[1]['choice']+' - Draw'); 
-                             io.to(player2ID).emit('player2', choices[0]['user'] + " chose " +choices[0]['choice']+' - Draw '); 
+                         case 'rock': 
+                              msg1= "Draw !";
+                              msg2 ="Draw !"  ;                          
+                             io.to(player1ID).emit('player1', player2Name + " chose " +player2Choice+ '-  '+ msg1); 
+                             io.to(player2ID).emit('player2', player1Name + " chose " +player1Choice+ '-  '+ msg2); 
+                             setData(choices,msg1,msg2);
                              break;
  
-                         case 'paper':                          
-                            io.to(player2ID).emit('player2', choices[0]['user'] + " chose " +choices[0]['choice']+' - You win :)');   
-                            io.to(player1ID).emit('player1', choices[1]['user'] + " chose " +choices[1]['choice']+' - You loss :('); 
-                                        
+                         case 'paper': 
+                             msg1= player1Name+" Lose";
+                             msg2 =player2Name+" Win"  ;                         
+                            io.to(player2ID).emit('player2', player1Name+ " chose " +player1Choice+' - You Win :)');   
+                            io.to(player1ID).emit('player1', player2Name+ " chose " +player2Choice+' - You Lose :('); 
+                            setData(choices,msg1,msg2);         
                              break;
          
-                         case 'scissors':                            
-                             io.to(player1ID).emit('player1', choices[1]['user'] + " chose " +choices[1]['choice']+' -You win :)');                           
-                             io.to(player2ID).emit('player2', choices[0]['user'] + " chose " +choices[0]['choice']+' - You loss :('); 
-                              
+                         case 'scissors':  
+                             msg2= player2Name+" Lose";
+                             msg1 =player1Name+" Win"  ;                          
+                             io.to(player1ID).emit('player1', player2Name + " chose " +player2Choice+'- You Win :)');                           
+                             io.to(player2ID).emit('player2', player1Name + " chose " +player1Choice+' - You Lose :(');
+                             setData(choices,msg1,msg2);
                              break;
  
                          default:
@@ -60,19 +88,28 @@ io.on('connection', (socket) => {
                  case 'paper':
                      switch (choices[1]['choice'])
                      {
-                         case 'rock':                           
-                            io.to(player1ID).emit('player1', choices[1]['user'] + " chose " +choices[1]['choice']+' -You win :)');                           
-                            io.to(player2ID).emit('player2', choices[0]['user'] + " chose " +choices[0]['choice']+' -You loss :(');                            
+                         case 'rock':
+                            msg1 =player1Name+" Win"  ;  
+                            msg2= player2Name+" Lose";                             
+                            io.to(player1ID).emit('player1', player2Name + " chose " +player2Choice + '-  You Win  :)');                          
+                            io.to(player2ID).emit('player2', player1Name + " chose " +player1Choice+' -   You Lose :('); 
+                            setData(choices,msg1,msg2);                          
                              break;
  
                          case 'paper':
-                             io.to(player1ID).emit('player1', choices[1]['user'] + " chose " +choices[1]['choice']+' - Draw'); 
-                             io.to(player2ID).emit('player2', choices[0]['user'] + " chose " +choices[0]['choice']+' - Draw '); 
+                            msg1 ="Draw !"  ; 
+                            msg2= "Draw !"; 
+                             io.to(player1ID).emit('player1', player2Name + " chose " +player2Choice+' -  '+ msg1); 
+                             io.to(player2ID).emit('player2', player1Name + " chose " +player1Choice+' -  '+ msg2 ); 
+                             setData(choices,msg1,msg2);
                              break;
          
-                         case 'scissors':                          
-                            io.to(player2ID).emit('player2', choices[0]['user'] + " chose " +choices[0]['choice']+' -You win :)');                            
-                            io.to(player1ID).emit('player1', choices[1]['user'] + " chose " +choices[1]['choice']+' -You loss :(');                            
+                         case 'scissors':  
+                            msg2 =player2Name+" Win"  ; 
+                            msg1= player1Name+" Lose";                         
+                            io.to(player2ID).emit('player2', player2Name + " chose " +player2Choice+' -  You Win :)');                           
+                            io.to(player1ID).emit('player1', player2Name + " chose " +player2Choice+'  - You Lose :(');  
+                            setData(choices,msg1,msg2);                           
                              break;
  
                          default:
@@ -83,21 +120,30 @@ io.on('connection', (socket) => {
                  case 'scissors':
                      switch (choices[1]['choice'])
                      {
-                         case 'rock':                          
-                           io.to(player2ID).emit('player2', choices[0]['user'] + " chose " +choices[0]['choice']+' -You win :)');                          
-                           io.to(player1ID).emit('player1', choices[1]['user'] + " chose " +choices[1]['choice']+' -You loss :('); 
+                         case 'rock':   
+                            msg2 =player2Name +" Win"  ; 
+                            msg1= player1Name +" Lose";                        
+                           io.to(player2ID).emit('player2', player1Name + " chose " +player1Choice +'- You Win :)');                        
+                           io.to(player1ID).emit('player1', player2Name + " chose " +player2Choice +' - You Lose :(');  
+                           setData(choices,msg1,msg2);  
                             
                              break;
  
-                         case 'paper':                          
-                            io.to(player1ID).emit('player1', choices[1]['user'] + " chose " +choices[1]['choice']+' -You win :)');                           
-                            io.to(player2ID).emit('player2', choices[0]['user'] + " chose " +choices[0]['choice']+' -You loss :('); 
+                         case 'paper': 
+                             msg1 =player1Name +" Win"  ; 
+                             msg2= player2Name+" Lose";                          
+                            io.to(player1ID).emit('player1', player2Name + " chose " +player2Choice +' - You Win :)');                                
+                            io.to(player2ID).emit('player2', player1Name + " chose " +player1Choice +' - You Lose :(');   
+                            setData(choices,msg1,msg2); 
                              
                              break;
          
                          case 'scissors':
-                            io.to(player1ID).emit('player1', choices[1]['user'] + " chose " +choices[1]['choice']+' - Draw'); 
-                            io.to(player2ID).emit('player2', choices[0]['user'] + " chose " +choices[0]['choice']+' - Draw '); 
+                            msg1 ="Draw !"  ; 
+                            msg2= "Draw !"; 
+                            io.to(player1ID).emit('player1', player2Name + " chose " +player2Choice +'   - Draw !'); 
+                            io.to(player2ID).emit('player2', player1Name + " chose " +player1Choice +'   - Draw !'); 
+                            setData(choices,msg1,msg2);
                              break;
  
                          default:
@@ -108,6 +154,8 @@ io.on('connection', (socket) => {
                  default:
                      break;
              }
+             
+
  
             choices=[];
          }
@@ -119,3 +167,20 @@ io.on('connection', (socket) => {
 http.listen(3000, () => {
     console.log('listening on *:3000');
 });
+
+function setData(player, msg1,msg2){
+     gameStatus=
+        {
+            player1_id:player[0]['userid'],
+            Player1_name:player[0]['user'],
+            Player1_choice:player[0]['choice'],
+            result :msg1,
+            player2_id:player[1]['userid'],
+            Player2_name:player[1]['user'],
+            Player2_choice:player[1]['choice'],
+            result2 :msg2
+        }
+
+        playersRef.push(gameStatus);
+}
+

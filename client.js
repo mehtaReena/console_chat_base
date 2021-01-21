@@ -16,9 +16,9 @@ socket.on('connect', () => {
             console.log("Successfully connected to server");  
             name = user;
             id=socket.id;
-            var msg = name + " has joined the game"; 
-           // io.emit('simple chat message',{msg,id});             
-            rl.prompt(true);
+         /*    var msg = name + " has joined the game"; 
+            io.emit('simple chat message',{msg,id});            
+            rl.prompt(true); */ 
             askChoice();
             
         });
@@ -28,13 +28,7 @@ socket.on('connect', () => {
    
   });
 
-  
-/* rl.on('line', function (line) {       
-    // send chat message
-   io.emit('simple chat message',name+": "+line);   
-   rl.prompt(true);
-        
-}); */
+
 
 
 socket.on('disconnect', () => {
@@ -61,15 +55,10 @@ rl.question("R)ock, (P)aper or (S)cissors? ", function(option){
 }
 
 
-socket.on('simple chat message', function (data) {
-    
+socket.on('simple chat message', function (data) {    
     if(data) {
-        console.log(data); 
-       
-    }
-       
-    
-     
+        console.log(data);        
+    }   
   });
 
   socket.on('player2', function (data) {
