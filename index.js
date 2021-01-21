@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
 
     socket.on('player choice', function (userid,username, choice) {
          choices.push({'userid': userid,'user': username, 'choice': choice.toLowerCase()});
-         console.log( username+" says "+ choice);
+         console.log( username+" says: "+ choice);
          if(choices.length == 2) {            
            
              let player1ID=socketId=choices[0]['userid']; 
