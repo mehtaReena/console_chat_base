@@ -57,14 +57,15 @@ rl.question("R)ock, (P)aper or (S)cissors? ", function(option){
 
 socket.on('simple chat message', function (data) {    
     if(data) {
-        console.log(data);        
+        console.log(data);  
+        askChoice();      
     }   
   });
 
   socket.on('player2', function (data) {
     if(data) {
         console.log(data); 
-        askChoice();
+       
     }
     
   });
@@ -72,7 +73,7 @@ socket.on('simple chat message', function (data) {
   socket.on('player1', function (data) {
     if(data) {
         console.log(data); 
-        askChoice();
+        //askChoice();
     } 
   });
 
